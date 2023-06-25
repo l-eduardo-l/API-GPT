@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  <title>Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      width: 400px;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    
+    .message {
+      margin-bottom: 10px;
+    }
+    
+    .person {
+      background-color: #e1ffc7;
+    }
+    
+    .chatbox {
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="chatbox" class="chatbox"></div>
+    <input id="messageInput" type="text" placeholder="Digite sua mensagem" />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+  <script>
+    const botao = document.querySelector("button");
+    async function sendMessage() {
+      botao.disabled = true;
+      var messageInput = document.getElementById("messageInput");
+      var message = messageInput.value;
+      
+      if (message !== "") {
+        var chatbox = document.getElementById("chatbox");
+        
+        // Cria o elemento para a mensagem da pessoa
+        var personMessage = document.createElement("div");
+        personMessage.className = "message person";
+        personMessage.innerHTML = message;
+        chatbox.appendChild(personMessage);
+        
+        // Cria o elemento para a mensagem do chat box
+        var chatboxMessage = document.createElement("div");
+        chatboxMessage.className = "message chatbox";
+        chatboxMessage.innerHTML = await chatBotApi(message);
+        chatbox.appendChild(chatboxMessage);
+        
+        botao.disabled = false;
+        messageInput.value = ""; // Limpa o campo de entrada
+      }
+    }
+
+    async function chatBotApi(mensagem = null) {
+      try {
+        const response = await axios.post('/', {
+          mensagem: mensagem
+        });
+
+        const respostaJSON = await response.data;
+        console.log(respostaJSON.retornoAPi);
+        return respostaJSON.retornoAPi;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    function enviarPost() {
+      axios.post('/logout', {})
+        .then(response => {})
+        .catch(error => {});
+    }
+
+    window.addEventListener('beforeunload', enviarPost())
+
+  </script>
+</body>
+</html>
